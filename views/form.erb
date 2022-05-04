@@ -1,0 +1,22 @@
+<article>
+<h2>new</h2>
+<form method="post" action="/memo">
+  <div class="form-items">
+    <div class="form-items__item">
+      <label>タイトル</label><br>
+      <input type="text" name="title" maxlength="50" required>
+    </div>
+    <div class="form-items__item">
+      <label>内容</label><br>
+      <textarea name="entry" maxlength="500" wrap="soft"></textarea>
+    </div>
+  </div>
+  <div class="common__button">
+    <input class="common__button__save" type="submit" value="save">
+  </div>
+</form>
+
+<div class="common__button">
+  <input class="common__button__index" type="button" value="index" onclick="location.href='/memo/index'">
+</div>
+</article>
