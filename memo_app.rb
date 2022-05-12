@@ -13,8 +13,8 @@ class MemoData
     @id = 0
   end
 
-  def add_memo(title, entry)
-    @memos[@id] = { title: title, entry: entry }
+  def add_memo(title, content)
+    @memos[@id] = { title: title, content: content }
     open('data.txt', 'a') do |f|
       f.write "#{@id},#{@memos[@id]}\n"
     end
@@ -39,11 +39,11 @@ my_memos = MemoData.new
 loaded_data = File.read('data.txt')
 unless loaded_data == ''
   ids = loaded_data.scan(/^\d+/).map(&:to_i)
-  titles = loaded_data.scan(/(?<={:title=>").+(?=", :entry=>)/)
-  entries = loaded_data.scan(/(?<=:entry=>").+(?="})/)
+  titles = loaded_data.scan(/(?<={:title=>").+(?=", :content=>)/)
+  contents = loaded_data.scan(/(?<=:content=>").+(?="})/)
   memos = {}
   ids.each_with_index do |id, n|
-    memos[id] = { title: titles[n], entry: entries[n] }
+    memos[id] = { title: titles[n], content: contents[n] }
   end
   my_memos.memos = memos
   my_memos.id = ids[-1] + 1
@@ -62,7 +62,7 @@ get '/memo/:id' do
   memos = my_memos.memos
   @id = params[:id].to_i
   @title = memos.dig(@id, :title).to_s
-  @entry = memos.dig(@id, :entry).to_s
+  @content = memos.dig(@id, :content).to_s
   erb :memo
 end
 
@@ -72,8 +72,8 @@ end
 
 post '/memo' do
   title = CGI.escapeHTML(params[:title])
-  entry = CGI.escapeHTML(params[:entry].rstrip)
-  my_memos.add_memo(title, entry)
+  content = CGI.escapeHTML(params[:content].rstrip)
+  my_memos.add_memo(title, content)
   redirect '/memo/index'
 end
 
@@ -87,15 +87,15 @@ get '/memo/:id/edit' do
   memos = my_memos.memos
   @id = params[:id].to_i
   @title = memos.dig(@id, :title).to_s
-  @entry = memos.dig(@id, :entry).to_s
+  @content = memos.dig(@id, :content).to_s
   erb :edit
 end
 
 patch '/memo/:id/edit' do
   id = params[:id].to_i
   title = CGI.escapeHTML(params[:title])
-  entry = CGI.escapeHTML(params[:entry].rstrip)
-  my_memos.memos[id] = { title: title, entry: entry }
+  content = CGI.escapeHTML(params[:content].rstrip)
+  my_memos.memos[id] = { title: title, content: content }
   my_memos.rewrite_file
   redirect '/memo/index'
 end
