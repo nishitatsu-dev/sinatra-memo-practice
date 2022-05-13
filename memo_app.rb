@@ -16,7 +16,7 @@ class MemoData
   def add_memo(title, content)
     @memos[@id] = { title: title, content: content }
     open('data.txt', 'a') do |f|
-      f.write "#{@id},#{@memos[@id]}\n"
+      f.write "{\"id\": #{@id}, \"title\": \"#{title}\", \"content\": \"#{content}\"}\n"
     end
     @id += 1
   end
@@ -28,8 +28,9 @@ class MemoData
 
   def rewrite_file
     open('data.txt', 'w') do |f|
+      p @memos
       @memos.each do |id, value|
-        f.write "#{id},#{value}\n"
+        f.write "{\"id\": #{id}, \"title\": \"#{value[:title]}\", \"content\": \"#{value[:content]}\"}\n"
       end
     end
   end
@@ -38,9 +39,9 @@ end
 my_memos = MemoData.new
 loaded_data = File.read('data.txt')
 unless loaded_data == ''
-  ids = loaded_data.scan(/^\d+/).map(&:to_i)
-  titles = loaded_data.scan(/(?<={:title=>").+(?=", :content=>)/)
-  contents = loaded_data.scan(/(?<=:content=>").+(?="})/)
+  ids = loaded_data.scan(/(?<={"id": )\d+(?=,)/).map(&:to_i)
+  titles = loaded_data.scan(/(?<="title": ").+(?=",)/)
+  contents = loaded_data.scan(/(?<="content": ").+(?="})/)
   memos = {}
   ids.each_with_index do |id, n|
     memos[id] = { title: titles[n], content: contents[n] }
