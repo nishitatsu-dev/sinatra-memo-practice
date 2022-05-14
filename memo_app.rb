@@ -34,6 +34,13 @@ class MemoData
       end
     end
   end
+
+  def select_memo_data(params)
+    id = params[:id].to_i
+    title = self.memos.dig(id, :title).to_s
+    content = self.memos.dig(id, :content).to_s
+    [id, title, content]
+  end
 end
 
 my_memos = MemoData.new
@@ -56,10 +63,7 @@ get '/memo/index' do
 end
 
 get '/memo/:id' do
-  memos = my_memos.memos
-  @id = params[:id].to_i
-  @title = memos.dig(@id, :title).to_s
-  @content = memos.dig(@id, :content).to_s
+  @id, @title, @content = my_memos.select_memo_data(params)
   erb :memo
 end
 
@@ -81,10 +85,7 @@ delete '/memo/:id' do
 end
 
 get '/memo/:id/edit' do
-  memos = my_memos.memos
-  @id = params[:id].to_i
-  @title = memos.dig(@id, :title).to_s
-  @content = memos.dig(@id, :content).to_s
+  @id, @title, @content = my_memos.select_memo_data(params)
   erb :edit
 end
 
