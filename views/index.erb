@@ -1,7 +1,12 @@
 <article>
 <h2>index</h2>
-<%= @title_list %>
-<br>
+
+<ul>
+  <% @title_list.each do |id, memo| %>
+    <li><a href="/memo/<%= id %>"><%= memo[:title] %></a></li>
+  <% end %>
+</ul>
+
 <div class="common__button">
   <input class="top__button__add" type="button" value="new" onclick="location.href='/memo'">
 </div>

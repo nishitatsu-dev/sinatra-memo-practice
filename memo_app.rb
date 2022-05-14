@@ -51,11 +51,7 @@ unless loaded_data == ''
 end
 
 get '/memo/index' do
-  @title_list = "<ul>\n"
-  my_memos.memos.each do |id, memo|
-    @title_list += "<li><a href=\"/memo/#{id}\">#{memo[:title]}</a></li>\n"
-  end
-  @title_list += "</ul>\n"
+  @title_list = my_memos.memos
   erb :index
 end
 
