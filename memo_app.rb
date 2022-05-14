@@ -51,7 +51,7 @@ unless loaded_data == ''
 end
 
 get '/memo/index' do
-  @title_list = my_memos.memos
+  @my_all_memos = my_memos.memos
   erb :index
 end
 

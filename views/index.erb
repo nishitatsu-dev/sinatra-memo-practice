@@ -2,7 +2,7 @@
 <h2>index</h2>
 
 <ul>
-  <% @title_list.each do |id, memo| %>
+  <% @my_all_memos.each do |id, memo| %>
     <li><a href="/memo/<%= id %>"><%= memo[:title] %></a></li>
   <% end %>
 </ul>
