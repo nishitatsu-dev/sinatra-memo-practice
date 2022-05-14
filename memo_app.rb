@@ -28,7 +28,6 @@ class MemoData
 
   def rewrite_file
     open('data.txt', 'w') do |f|
-      p @memos
       @memos.each do |id, value|
         f.write "{\"id\": #{id}, \"title\": \"#{value[:title]}\", \"content\": \"#{value[:content]}\"}\n"
       end
@@ -73,7 +72,7 @@ end
 
 post '/memo' do
   title = CGI.escapeHTML(params[:title])
-  content = CGI.escapeHTML(params[:content].rstrip)
+  content = CGI.escapeHTML(params[:content].rstrip).gsub(/\r\n|\r|\n/, "<br>")
   my_memos.add_memo(title, content)
   redirect '/memo/index'
 end
@@ -92,7 +91,7 @@ end
 patch '/memo/:id/edit' do
   id = params[:id].to_i
   title = CGI.escapeHTML(params[:title])
-  content = CGI.escapeHTML(params[:content].rstrip)
+  content = CGI.escapeHTML(params[:content].rstrip).gsub(/\r\n|\r|\n/, "<br>")
   my_memos.memos[id] = { title: title, content: content }
   my_memos.rewrite_file
   redirect '/memo/index'
