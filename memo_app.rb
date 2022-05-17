@@ -41,21 +41,25 @@ class MemoData
     content = @memos.dig(id, :content).to_s
     [id, title, content]
   end
+
+  def read_memo
+    loaded_data = File.read('data.txt')
+    return if loaded_data == ''
+
+    ids = loaded_data.scan(/(?<={"id":)\d+(?=,)/).map(&:to_i)
+    titles = loaded_data.scan(/(?<="title":").+(?=",)/)
+    contents = loaded_data.scan(/(?<="content":").+(?="})/)
+    memos = {}
+    ids.each_with_index do |id, n|
+      memos[id] = { title: titles[n], content: contents[n] }
+    end
+    @memos = memos
+    @id = ids[-1] + 1
+  end
 end
 
 my_memos = MemoData.new
-loaded_data = File.read('data.txt')
-unless loaded_data == ''
-  ids = loaded_data.scan(/(?<={"id":)\d+(?=,)/).map(&:to_i)
-  titles = loaded_data.scan(/(?<="title":").+(?=",)/)
-  contents = loaded_data.scan(/(?<="content":").+(?="})/)
-  memos = {}
-  ids.each_with_index do |id, n|
-    memos[id] = { title: titles[n], content: contents[n] }
-  end
-  my_memos.memos = memos
-  my_memos.id = ids[-1] + 1
-end
+my_memos.read_memo
 
 get '/memo/index' do
   @my_all_memos = my_memos.memos
