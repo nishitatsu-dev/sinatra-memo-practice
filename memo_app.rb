@@ -42,9 +42,9 @@ class MemoData
     loaded_data = File.read('data.txt')
     return if loaded_data == ''
 
-    p memos = JSON::Parser.new(loaded_data, symbolize_names: true).parse
+    memos = JSON::Parser.new(loaded_data, symbolize_names: true).parse
     @memos = memos.transform_keys { |k| k.to_s.to_i }
-    @id = @memos.keys[-1] + 1
+    @id = @memos.keys[-1] + 1  # メモIDの最新を取得し、１送る
   end
 end
 
