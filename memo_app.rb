@@ -16,9 +16,7 @@ class MemoData
 
   def add_memo(title, content)
     @memos[@id] = { title: title, content: content }
-    open('data.txt', 'a') do |f|
-      f.write "{\"id\":#{@id},#{@memos[@id].to_json[1..]}\n"
-    end
+    rewrite_file
     @id += 1
   end
 
@@ -29,9 +27,7 @@ class MemoData
 
   def rewrite_file
     open('data.txt', 'w') do |f|
-      @memos.each do |id, value|
-        f.write "{\"id\":#{id},#{value.to_json[1..]}\n"
-      end
+      f.write @memos.to_json
     end
   end
 
@@ -46,15 +42,9 @@ class MemoData
     loaded_data = File.read('data.txt')
     return if loaded_data == ''
 
-    ids = loaded_data.scan(/(?<={"id":)\d+(?=,)/).map(&:to_i)
-    titles = loaded_data.scan(/(?<="title":").+(?=",)/)
-    contents = loaded_data.scan(/(?<="content":").+(?="})/)
-    memos = {}
-    ids.each_with_index do |id, n|
-      memos[id] = { title: titles[n], content: contents[n] }
-    end
-    @memos = memos
-    @id = ids[-1] + 1
+    p memos = JSON::Parser.new(loaded_data, symbolize_names: true).parse
+    @memos = memos.transform_keys { |k| k.to_s.to_i }
+    @id = @memos.keys[-1] + 1
   end
 end
 
