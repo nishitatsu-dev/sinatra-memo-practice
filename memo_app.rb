@@ -66,7 +66,7 @@ get '/memo' do
 end
 
 post '/memo' do
-  title = CGI.escapeHTML(params[:title])
+  title = CGI.escapeHTML(params[:title].rstrip)
   content = CGI.escapeHTML(params[:content].rstrip).gsub(/\r\n|\r|\n/, '<br>')
   my_memos.add_memo(title, content)
   redirect '/memo/index'
@@ -86,7 +86,7 @@ end
 
 patch '/memo/:id/edit' do
   id = params[:id].to_i
-  title = CGI.escapeHTML(params[:title])
+  title = CGI.escapeHTML(params[:title].rstrip)
   content = CGI.escapeHTML(params[:content].rstrip).gsub(/\r\n|\r|\n/, '<br>')
   my_memos.memos[id] = { title: title, content: content }
   my_memos.rewrite_file
