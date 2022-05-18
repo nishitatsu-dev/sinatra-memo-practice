@@ -33,8 +33,8 @@ class MemoData
 
   def select_memo(params)
     id = params[:id].to_i
-    title = @memos.dig(id, :title).to_s
-    content = @memos.dig(id, :content).to_s
+    title = CGI.escapeHTML(@memos.dig(id, :title))
+    content = CGI.escapeHTML(@memos.dig(id, :content))
     [id, title, content]
   end
 
@@ -57,7 +57,8 @@ get '/memo/index' do
 end
 
 get '/memo/:id' do
-  @id, @title, @content = my_memos.select_memo(params)
+  @id, @title, content = my_memos.select_memo(params)
+  @content = content.gsub(/\r\n|\r|\n/, '<br>')
   erb :memo
 end
 
@@ -66,8 +67,8 @@ get '/memo' do
 end
 
 post '/memo' do
-  title = CGI.escapeHTML(params[:title].rstrip)
-  content = CGI.escapeHTML(params[:content].rstrip).gsub(/\r\n|\r|\n/, '<br>')
+  title = params[:title].rstrip
+  content = params[:content].rstrip
   my_memos.add_memo(title, content)
   redirect '/memo/index'
 end
@@ -79,15 +80,14 @@ delete '/memo/:id' do
 end
 
 get '/memo/:id/edit' do
-  @id, @title, content = my_memos.select_memo(params)
-  @content = content.gsub(/<br>/, "\n")
+  @id, @title, @content = my_memos.select_memo(params)
   erb :edit
 end
 
 patch '/memo/:id/edit' do
   id = params[:id].to_i
-  title = CGI.escapeHTML(params[:title].rstrip)
-  content = CGI.escapeHTML(params[:content].rstrip).gsub(/\r\n|\r|\n/, '<br>')
+  title = params[:title].rstrip
+  content = params[:content].rstrip
   my_memos.memos[id] = { title: title, content: content }
   my_memos.rewrite_file
   redirect '/memo/index'

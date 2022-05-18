@@ -3,7 +3,7 @@
 
 <ul>
   <% @my_all_memos.each do |id, memo| %>
-    <li><a href="/memo/<%= id %>"><%= memo[:title] %></a></li>
+    <li><a href="/memo/<%= id %>"><%= CGI.escapeHTML(memo[:title]) %></a></li>
   <% end %>
 </ul>
 
