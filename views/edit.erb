@@ -1,0 +1,23 @@
+<article>
+<h2>edit</h2>
+<form method="post" action="/memo/<%= @id %>/edit">
+  <div class="form-items">
+    <div class="form-items__item">
+      <label>タイトル</label><br>
+      <input type="text" name="title" value="<%= @title %>" maxlength="50" required>
+    </div>
+    <div class="form-items__item">
+      <label>内容</label><br>
+      <textarea name="content" maxlength="500" wrap="soft"><%= @content %></textarea>
+    </div>
+  </div>
+  <div class="common__button">
+    <input class="common__button__save" type="submit" value="save">
+    <input type="hidden" name="_method" value="patch">
+  </div>
+</form>
+
+<div class="common__button">
+  <input class="common__button__index" type="button" value="index" onclick="location.href='/memo/index'">
+</div>
+</article>

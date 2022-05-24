@@ -1,0 +1,283 @@
+@charset "utf-8";
+/*
+////////////////////////////////////////
+reset.css を読み込んで全てのスタイルをなくす
+////////////////////////////////////////
+*/
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/*
+////////////////////////////////////////
+reset.css では足りない初期化を追加
+////////////////////////////////////////
+*/
+
+/* 全てに box-sizing: border-box; を適用 */
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+/* 画像に関する初期設定 */
+img {
+  /* 大きい画像がはみ出さないように */
+  max-width: 100%;
+  /* 画像周りの無駄なスペースができないように */
+  vertical-align: bottom;
+}
+
+[data-whatinput="mouse"] *:focus,
+[data-whatinput="touch"] *:focus {
+  outline: none;
+}
+
+/*
+////////////////////////////////////////
+追加＠共通部分
+////////////////////////////////////////
+*/
+
+body {
+  font-size: 1em;
+  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'Hiragino Sans', 'Avenir',
+    'ヒラギノ角ゴシック', YuGothic, 'Yu Gothic', 'メイリオ', Meiryo, 'ＭＳ Ｐゴシック', 'MS PGothic';
+  background-color: whitesmoke;
+  padding: 1em;
+  max-width: 800px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  vertical-align: middle;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+h3,
+label {
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+/*
+////////////////////////////////////////
+追加＠個別項目
+////////////////////////////////////////
+*/
+
+/* メモの一覧 */
+ul {
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+ul li {
+  list-style-type: none;
+}
+
+/* メモの詳細表示・記入 */
+
+p {
+  background-color: #FFFFFF;
+  overflow-wrap: break-word;
+  margin-bottom: 1rem;
+}
+
+input[type="text"],
+textarea {
+  font-size: 1rem;
+  background-color: #FFFFFF;
+  border: solid 2px;
+  width: 100%;
+  padding: 0;
+}
+
+input[type="text"] {
+  height: 1.5rem;
+}
+
+textarea {
+  height: 12rem;
+}
+
+.form-items__item {
+  margin-bottom: 1rem;
+}
+
+/* ボタン */
+input[type="submit"],
+input[type="button"] {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  width: 10rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  margin: 0 1.5rem;
+}
+
+.common__button {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.common__button__index {
+  background-color: #33A852;
+}
+
+.common__button__save {
+  background-color: #4284F3;
+}
+
+.top__button__add {
+  background-color: #F9BB01;
+}
+
+.memo__button__edit {
+  background-color: #F9BB01;
+}
+
+.memo__button__del {
+  background-color: #E94234;
+}

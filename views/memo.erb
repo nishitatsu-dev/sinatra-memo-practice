@@ -1,0 +1,24 @@
+<article>
+<h2>memo</h2>
+<h3>タイトル</h3>
+<p><%= @title %></p>
+<h3>内容</h3>
+<p><%= @content %></p>
+
+<ul class="common__button">
+  <li>
+    <input class="memo__button__edit" type="button" value="edit" onclick="location.href='/memo/<%= @id %>/edit'">
+  </li>
+
+  <li>
+    <form method="post" action="/memo/<%= @id %>">
+      <input class="memo__button__del" type="submit" value="delete">
+      <input type="hidden" name="_method" value="delete">
+    </form>
+  </li>
+</ul>
+
+<div class="common__button">
+  <input class="common__button__index" type="button" value="index" onclick="location.href='/memo/index'">
+</div>
+</article>

@@ -1,0 +1,13 @@
+<article>
+<h2>index</h2>
+
+<ul>
+  <% @my_all_memos.each do |id, memo| %>
+    <li><a href="/memo/<%= id %>"><%= CGI.escapeHTML(memo[:title]) %></a></li>
+  <% end %>
+</ul>
+
+<div class="common__button">
+  <input class="top__button__add" type="button" value="new" onclick="location.href='/memo'">
+</div>
+</article>
