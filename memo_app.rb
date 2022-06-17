@@ -2,7 +2,7 @@
 
 require 'sinatra'
 require 'cgi'
-require 'json'
+require 'pg'
 
 set :environment, :production
 
@@ -11,23 +11,48 @@ class MemoData
 
   def initialize
     @memos = {}
-    @id = 0
+    read_memo
   end
 
   def add_memo(title, content)
-    @memos[@id] = { title: title, content: content }
-    rewrite_file
-    @id += 1
+    id = @memos.keys.map(&:to_i).max.to_i + 1
+    @memos[id] = { title: title, content: content }
+    begin
+      connect_db
+      @connection.exec(format('INSERT INTO inventory (id, title, content) VALUES(%<id>d, %<title>s, %<content>s);',
+                              id: id, title: "\'#{title}\'", content: "\'#{content}\'"))
+      puts 'Inserted 1 row of data.'
+    rescue PG::Error => e
+      puts e.message
+    ensure
+      @connection&.close
+    end
   end
 
   def delete_memo(id)
     @memos.delete(id)
-    rewrite_file
+    begin
+      connect_db
+      @connection.exec(format('DELETE FROM inventory WHERE id = %d;', id))
+      puts 'Deleted 1 row of data.'
+    rescue PG::Error => e
+      puts e.message
+    ensure
+      @connection&.close
+    end
   end
 
-  def rewrite_file
-    open('data.txt', 'w') do |f|
-      f.write @memos.to_json
+  def modify_memo(id, title, content)
+    @memos[id] = { title: title, content: content }
+    begin
+      connect_db
+      @connection.exec(format('UPDATE inventory SET title = %<title>s, content = %<content>s WHERE id = %<id>d;',
+                              title: "\'#{title}\'", content: "\'#{content}\'", id: id))
+      puts 'Updated 1 row of data.'
+    rescue PG::Error => e
+      puts e.message
+    ensure
+      @connection&.close
     end
   end
 
@@ -39,17 +64,34 @@ class MemoData
   end
 
   def read_memo
-    loaded_data = File.read('data.txt')
-    return if loaded_data == ''
+    begin
+      connect_db
+      @connection.exec('CREATE TABLE IF NOT EXISTS inventory (id serial PRIMARY KEY, title VARCHAR(50), content VARCHAR(500));')
+      puts 'Checked the table exists.'
+      loaded_data = @connection.exec('SELECT * from inventory;')
+    rescue PG::Error => e
+      puts e.message
+    ensure
+      @connection&.close
+    end
+    return if loaded_data.ntuples.zero?
 
-    memos = JSON::Parser.new(loaded_data, symbolize_names: true).parse
-    @memos = memos.transform_keys { |k| k.to_s.to_i }
-    @id = @memos.keys[-1] + 1  # メモIDの最新を取得し、１送る
+    loaded_data.each do |row|
+      id = row['id'].to_i
+      @memos[id] = { title: row['title'], content: row['content'] }
+    end
+  end
+
+  def connect_db
+    host = 'localhost'
+    database = 'memo_app_nishitatsu'
+
+    @connection = PG::Connection.new(host: host, dbname: database, port: '5432')
+    puts 'Successfully created connection to database'
   end
 end
 
 my_memos = MemoData.new
-my_memos.read_memo
 
 get '/memo/index' do
   @my_all_memos = my_memos.memos
@@ -88,7 +130,6 @@ patch '/memo/:id/edit' do
   id = params[:id].to_i
   title = params[:title].rstrip
   content = params[:content].rstrip
-  my_memos.memos[id] = { title: title, content: content }
-  my_memos.rewrite_file
+  my_memos.modify_memo(id, title, content)
   redirect '/memo/index'
 end
