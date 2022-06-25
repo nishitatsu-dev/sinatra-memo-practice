@@ -11,6 +11,7 @@ class MemoData
 
   def initialize
     @memos = {}
+    connect_db
     read_memo
   end
 
@@ -18,41 +19,32 @@ class MemoData
     id = @memos.keys.map(&:to_i).max.to_i + 1
     @memos[id] = { title: title, content: content }
     begin
-      connect_db
       @connection.exec(format('INSERT INTO inventory (id, title, content) VALUES(%<id>d, %<title>s, %<content>s);',
                               id: id, title: "\'#{title}\'", content: "\'#{content}\'"))
       puts 'Inserted 1 row of data.'
     rescue PG::Error => e
       puts e.message
-    ensure
-      @connection&.close
     end
   end
 
   def delete_memo(id)
     @memos.delete(id)
     begin
-      connect_db
       @connection.exec(format('DELETE FROM inventory WHERE id = %d;', id))
       puts 'Deleted 1 row of data.'
     rescue PG::Error => e
       puts e.message
-    ensure
-      @connection&.close
     end
   end
 
   def modify_memo(id, title, content)
     @memos[id] = { title: title, content: content }
     begin
-      connect_db
       @connection.exec(format('UPDATE inventory SET title = %<title>s, content = %<content>s WHERE id = %<id>d;',
                               title: "\'#{title}\'", content: "\'#{content}\'", id: id))
       puts 'Updated 1 row of data.'
     rescue PG::Error => e
       puts e.message
-    ensure
-      @connection&.close
     end
   end
 
@@ -65,14 +57,11 @@ class MemoData
 
   def read_memo
     begin
-      connect_db
       @connection.exec('CREATE TABLE IF NOT EXISTS inventory (id serial PRIMARY KEY, title VARCHAR(50), content VARCHAR(500));')
       puts 'Checked the table exists.'
       loaded_data = @connection.exec('SELECT * from inventory;')
     rescue PG::Error => e
       puts e.message
-    ensure
-      @connection&.close
     end
     return if loaded_data.ntuples.zero?
 
