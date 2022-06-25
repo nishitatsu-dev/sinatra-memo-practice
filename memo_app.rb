@@ -16,15 +16,16 @@ class MemoData
   end
 
   def add_memo(title, content)
-    id = @memos.keys.map(&:to_i).max.to_i + 1
-    @memos[id] = { title: title, content: content }
     begin
-      @connection.exec(format('INSERT INTO inventory (id, title, content) VALUES(%<id>d, %<title>s, %<content>s);',
-                              id: id, title: "\'#{title}\'", content: "\'#{content}\'"))
+      @connection.exec(format('INSERT INTO inventory (title, content) VALUES(%<title>s, %<content>s);',
+                              title: "\'#{title}\'", content: "\'#{content}\'"))
       puts 'Inserted 1 row of data.'
+      max_id = @connection.exec('SELECT max(id) from inventory;')
     rescue PG::Error => e
       puts e.message
     end
+    id = max_id[0]['max'].to_i
+    @memos[id] = { title: title, content: content }
   end
 
   def delete_memo(id)
