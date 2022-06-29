@@ -60,7 +60,7 @@ class MemoData
     begin
       @connection.exec('CREATE TABLE IF NOT EXISTS inventory (id serial PRIMARY KEY, title VARCHAR(50), content VARCHAR(500));')
       puts 'Checked the table exists.'
-      loaded_data = @connection.exec('SELECT * from inventory;')
+      loaded_data = @connection.exec('SELECT * from inventory ORDER BY id ASC;')
     rescue PG::Error => e
       puts e.message
     end
