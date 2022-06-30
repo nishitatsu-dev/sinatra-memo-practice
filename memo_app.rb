@@ -10,7 +10,7 @@ class MemoData
   attr_accessor :memos, :id
 
   def initialize
-    @memos = {}
+    @memos = []
     connect_db
     read_memo
   end
@@ -25,11 +25,11 @@ class MemoData
       puts e.message
     end
     id = max_id[0]['max'].to_i
-    @memos[id] = { title: title, content: content }
+    @memos << [id, title, content]
   end
 
   def delete_memo(id)
-    @memos.delete(id)
+    @memos.delete_if { |n| n[0] == id }
     begin
       @connection.exec(format('DELETE FROM inventory WHERE id = %d;', id))
       puts 'Deleted 1 row of data.'
@@ -39,7 +39,8 @@ class MemoData
   end
 
   def modify_memo(id, title, content)
-    @memos[id] = { title: title, content: content }
+    id_index = @memos.index { |n| n[0] == id }
+    @memos[id_index] = [id, title, content]
     begin
       @connection.exec(format('UPDATE inventory SET title = %<title>s, content = %<content>s WHERE id = %<id>d;',
                               title: "\'#{title}\'", content: "\'#{content}\'", id: id))
@@ -51,8 +52,8 @@ class MemoData
 
   def select_memo(params)
     id = params[:id].to_i
-    title = CGI.escapeHTML(@memos.dig(id, :title))
-    content = CGI.escapeHTML(@memos.dig(id, :content))
+    title = CGI.escapeHTML(@memos.assoc(id)[1])
+    content = CGI.escapeHTML(@memos.assoc(id)[2])
     [id, title, content]
   end
 
@@ -68,7 +69,7 @@ class MemoData
 
     loaded_data.each do |row|
       id = row['id'].to_i
-      @memos[id] = { title: row['title'], content: row['content'] }
+      @memos << [id, row['title'], row['content']]
     end
   end
 

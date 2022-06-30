@@ -2,8 +2,8 @@
 <h2>index</h2>
 
 <ul>
-  <% @my_all_memos.each do |id, memo| %>
-    <li><a href="/memo/<%= id %>"><%= CGI.escapeHTML(memo[:title]) %></a></li>
+  <% @my_all_memos.each do |n| %>
+    <li><a href="/memo/<%= n[0] %>"><%= CGI.escapeHTML(n[1]) %></a></li>
   <% end %>
 </ul>
 
