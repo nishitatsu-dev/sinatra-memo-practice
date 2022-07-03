@@ -74,10 +74,12 @@ class MemoData
   end
 
   def connect_db
-    host = 'localhost'
-    database = 'memo_app_nishitatsu'
+    user = ENV.fetch('MEMO_APP_USER', '')
+    password = ENV.fetch('MEMO_APP_PW', '')
+    host = ENV.fetch('MEMO_APP_HOST', 'localhost')
+    database = ENV['MEMO_APP_DB']
 
-    @connection = PG::Connection.new(host: host, dbname: database, port: '5432')
+    @connection = PG::Connection.new(user: user, password: password, host: host, dbname: database, port: '5432')
     puts 'Successfully created connection to database'
   end
 end
