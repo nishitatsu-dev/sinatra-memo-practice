@@ -7,19 +7,17 @@ require 'pg'
 set :environment, :production
 
 class MemoData
-  attr_accessor :memos, :id, :temp_memos
+  attr_accessor :memos, :id
 
   def initialize
     @memos = []
     connect_db
     read_memo
-    @temp_memos = []
   end
 
   def add_memo(title, content)
     begin
-      @connection.exec(format('INSERT INTO inventory (title, content) VALUES(%<title>s, %<content>s);',
-                              title: "\'#{title}\'", content: "\'#{content}\'"))
+      @connection.exec_params('INSERT INTO inventory (title, content) VALUES($1, $2)', [title, content])
       puts 'Inserted 1 row of data.'
       max_id = @connection.exec('SELECT max(id) from inventory;')
     rescue PG::Error => e
@@ -43,8 +41,7 @@ class MemoData
     id_index = @memos.index { |n| n[0] == id }
     @memos[id_index] = [id, title, content]
     begin
-      @connection.exec(format('UPDATE inventory SET title = %<title>s, content = %<content>s WHERE id = %<id>d;',
-                              title: "\'#{title}\'", content: "\'#{content}\'", id: id))
+      @connection.exec_params('UPDATE inventory SET title = $1, content = $2 WHERE id = $3', [title, content, id])
       puts 'Updated 1 row of data.'
     rescue PG::Error => e
       puts e.message
@@ -83,23 +80,6 @@ class MemoData
     @connection = PG::Connection.new(user: user, password: password, host: host, dbname: database, port: '5432')
     puts 'Successfully created connection to database'
   end
-
-  PROHIBITED_LETTERS = ["'", ';'].freeze
-  def check_letter(title, content)
-    letter = /(#{PROHIBITED_LETTERS.join("|")})/
-    reminder = '（使えない文字を消してください）'
-    if title.match?(letter)
-      @temp_memos = [reminder + title, content]
-    elsif content.match?(letter)
-      @temp_memos = [title, "#{reminder}\n#{content}"]
-    else
-      false
-    end
-  end
-
-  def notice_letter
-    "（使えない文字  #{PROHIBITED_LETTERS.join(' ')}）"
-  end
 end
 
 my_memos = MemoData.new
@@ -116,22 +96,12 @@ get '/memo/:id' do
 end
 
 get '/memo' do
-  if my_memos.temp_memos.empty?
-    @title = ''
-    @content = ''
-  else
-    @title, @content = my_memos.temp_memos
-    my_memos.temp_memos.clear
-  end
-  @notice = my_memos.notice_letter
   erb :form
 end
 
 post '/memo' do
   title = params[:title].rstrip
   content = params[:content].rstrip
-  redirect '/memo' if my_memos.check_letter(title, content)
-
   my_memos.add_memo(title, content)
   redirect '/memo/index'
 end
@@ -144,11 +114,6 @@ end
 
 get '/memo/:id/edit' do
   @id, @title, @content = my_memos.select_memo(params)
-  unless my_memos.temp_memos.empty?
-    @title, @content = my_memos.temp_memos
-    my_memos.temp_memos.clear
-  end
-  @notice = my_memos.notice_letter
   erb :edit
 end
 
@@ -156,8 +121,6 @@ patch '/memo/:id/edit' do
   id = params[:id].to_i
   title = params[:title].rstrip
   content = params[:content].rstrip
-  redirect "/memo/#{params[:id]}/edit" if my_memos.check_letter(title, content)
-
   my_memos.modify_memo(id, title, content)
   redirect '/memo/index'
 end

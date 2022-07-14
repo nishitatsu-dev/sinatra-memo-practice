@@ -3,11 +3,11 @@
 <form method="post" action="/memo/<%= @id %>/edit">
   <div class="form-items">
     <div class="form-items__item">
-      <label>タイトル<%= @notice %></label><br>
+      <label>タイトル</label><br>
       <input type="text" name="title" value="<%= @title %>" maxlength="50" required>
     </div>
     <div class="form-items__item">
-      <label>内容<%= @notice %></label><br>
+      <label>内容</label><br>
       <textarea name="content" maxlength="500" wrap="soft"><%= @content %></textarea>
     </div>
   </div>
